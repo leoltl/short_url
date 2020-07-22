@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container border mt-5 p-4 text-center">
+    <h3>Paste the URL to be shortened</h3>
+    <form class="m-4" method="POST" action="{{url_for('index')}}">
+    {{ form.hidden_tag() }}
+    <div class="form-group align-bottom">
+      {{ form.fullUrl.label(class="sr-only") }}
+      {{ form.fullUrl(class="form-control") }}
+    </div>
+    <button class="btn btn-sm btn-primary" type="submit" value="Shorten URL">Shortify URL</button>
+  </form>
+  <small>Shortify is a free tool to shorten a URL or reduce a link.<br>
+  Use our URL Shortener to create a shortened link making it easy to remember.</small>
+  </div>
+{% endblock %}

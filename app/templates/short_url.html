@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container border mt-5 p-4 text-center">
+    <h3>Your shortened URL</h3>
+    <small>Copy the shortened link and share it in messages, texts, posts, websites and other locations.</small>
+    <form class="m-4" action="#">
+      <div class="form-group align-bottom">
+        <input id="shortUrl" size="50" value="{{ url_for('redirect_to_full', shortID = url.short, _external=True) }}">
+      </div>
+      <button onclick="javascript:copyText()"class="btn btn-sm btn-primary" type="submit" value="Copy shortened url">Copy URL</button>
+    </form>
+    <div class="m-2 text-left">
+      Long URL: <a href="{{ url.full }}">{{ url.full }}</a>
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    function copyText() {
+      let copyText = document.getElementById("shortUrl")
+
+      /* Select the text field */
+      copyText.select();
+      copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+      /* Copy the text inside the text field */
+      document.execCommand("copy");
+
+      /* Alert the copied text */
+      alert("Copied the text: " + copyText.value);
+    }
+  </script>
+{% endblock%}
