@@ -6,11 +6,10 @@
   <title>
     {% block title %}
       {% if title %} 
-        {{ title }}
-      {% else %}
-      {{ config.APP_NAME }} 
-      {% endif %}
-      | Your best choice for url shortener
+        {{ title }} —
+        {% endif %}
+      {{ config.APP_NAME }} | Your best choice for url shortener
+      
     {% endblock %}
   </title>
   <!-- Bootstap css -->
@@ -19,16 +18,15 @@
 <body>
   {% include "_nav.html" %} 
   <main>
-
     {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-info" role="alert">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-      {% endwith %}
+      {% if messages %}
+          {% for message in messages %}
+          <div class="alert alert-info" role="alert">{{ message }}</div>
+          {% endfor %}
+      {% endif %}
+    {% endwith %}
 
-      {# application content needs to be provided in the content block #}
+    {# application content needs to be provided in the content block #}
     {% block content %}{% endblock %}
     
     {% block script %}{% endblock %}
