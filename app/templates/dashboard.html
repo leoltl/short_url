@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container m-5 text-center">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Short URL</th>
+        <th scope="col">Full URL</th>
+        <th scope="col">Number of visits</th>
+        <th scope="col">Created At</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for url in urls %}
+        <tr>
+          <td><a href="{{url_for('redirect_to_full', shortID=url.short)}}">{{ url.short }}</a></td>
+          <td><a href="{{ url.full }}">{{ url.full }}</a></td>
+          <td>{{ url.visits|length }}</td>
+          <td>{{ moment(url.create_at).format('LLL') }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block script %}
+  {{ moment.include_moment() }}
+{% endblock %}

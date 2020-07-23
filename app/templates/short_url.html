@@ -4,13 +4,19 @@
   <div class="container border mt-5 p-4 text-center">
     <h3>Your shortened URL</h3>
     <small>Copy the shortened link and share it in messages, texts, posts, websites and other locations.</small>
-    <div class="m-4">
+    <form class="m-4">
       <div class="form-group align-bottom">
-        <input id="shortUrl" size="50" value="{{ url_for('redirect_to_full', shortID = url.short, _external=True) }}">
+        <input 
+          id="shortUrl" 
+          size="{{ url_for('redirect_to_full', shortID = url.short, _external=True)|length - 5 }}"
+          value="{{ url_for('redirect_to_full', shortID = url.short, _external=True) }}">
       </div>
-      <button onclick="javascript:copyText()"class="btn btn-sm btn-primary" value="Copy shortened url">Copy URL</button>
-    </div>
-    <div class="m-2 text-left">
+      <button id="copy" class="btn btn-sm btn-primary" value="Copy shortened url">Copy URL</button>
+      <div class="balloon align-top" id="balloon" style="visibility: hidden;">
+        <span class="badge badge-light">URL Copied</span>
+      </div>
+    </form>
+    <div class="m-2 text-center">
       Long URL: <a href="{{ url.full }}">{{ url.full }}</a>
     </div>
   </div>
@@ -18,18 +24,28 @@
 
 {% block script %}
   <script>
-    function copyText(e) {
-      let copyText = document.getElementById("shortUrl")
+    (() => {
+      const copyBtn = document.getElementById("copy")
+      copyBtn.addEventListener('click', e => {
+        e.preventDefault()
+        copyText()
+      })
 
-      /* Select the text field */
-      copyText.select();
-      copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+      function copyText() {
+        const copyText = document.getElementById("shortUrl")
+        /* Select the text field */
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+        /* Copy the text inside the text field */
+        document.execCommand("copy");
 
-      /* Copy the text inside the text field */
-      document.execCommand("copy");
-
-      /* Alert the copied text */
-      alert("URL Copied: " + copyText.value);
-    }
+        /* set tag visible and hidden after 2.5s*/
+        const balloon = document.getElementById("balloon")
+        balloon.style.visibility = "visible"
+        setTimeout(() => {
+          balloon.style.visibility = "hidden"
+        }, 2500)
+      }
+    })()
   </script>
 {% endblock%}

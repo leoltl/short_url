@@ -1,15 +1,14 @@
 from app import app, db
-from app.models import URL, User
+from app.models import URL, User, Visit
 from app.forms import MainURLForm, LoginForm, RegistrationForm
 from flask import render_template, flash, redirect, url_for, request, session
-from utils import generateUniqueID, retry
+from utils import retry
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from datetime import timedelta 
 from functools import wraps
+from sqlalchemy import exc
 import json 
-
-shortUrl_length = app.config['SHORTURL_LENGTH']
 
 def login_disallowed(_fn=None, *, redirect_to=None):
   # prevent signed in user to access specified (ie decorated) route, specify
@@ -41,31 +40,42 @@ def result():
       description=f'There is no data with {urlID}')
     return render_template('short_url.html', url=url, title='Shortened URL')
 
-  shortID = None
-  urlObject = None
+  shortID, urlObject = None, None
   def insertURL(url):
-    nonlocal shortID
-    nonlocal urlObject
-    shortID = generateUniqueID(shortUrl_length)
-    urlObject = URL(full=url, short=shortID)
+    nonlocal shortID, urlObject
+    urlObject, shortID = URL().set_value(
+      full=url, 
+      userid=current_user.id if current_user.is_authenticated else 1)
     db.session.add(urlObject)
     db.session.commit()
+
   form = MainURLForm(request.form)
   if form.validate_on_submit():
     try:
       insertURL(form.fullUrl.data)
-    except Exception as e:
+    except exc.IntegrityError:
       db.session.rollback()
       retry(lambda: insertURL(form.fullUrl.data), 2)
-    flash(f'Url is successfully shortified {shortID}')
     return redirect(url_for('result', short=[shortID]))
   return redirect(url_for('index'))
 
 @app.route('/l/<shortID>')
 def redirect_to_full(shortID):
+  def record_visit(url):
+    visit = Visit(url_record=url)
+    db.session.add(visit)
+    db.session.commit()
+
   url = URL.query.filter_by(short=shortID).first_or_404(
     description=f'There is no data with {shortID}')
+  record_visit(url.id)
   return redirect(url.full)
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+  urls = current_user.urls.all()
+  return render_template("dashboard.html", urls=urls)
 
 @app.route('/login', methods=('GET', 'POST'))
 @login_disallowed
@@ -93,11 +103,11 @@ def logout():
 def register():
   form = RegistrationForm()
   if form.validate_on_submit():
-    user = User(
+    user = User().set_value(
       name=form.name.data, 
       email=form.email.data, 
-      username=form.email.data)
-    user.set_password(form.password.data)
+      username=form.email.data,
+      password=form.password.data)
     db.session.add(user)
     db.session.commit()
     login_user(user, remember=True)
