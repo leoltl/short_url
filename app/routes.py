@@ -1,12 +1,13 @@
 from app import app, db
 from app.models import URL, User
 from app.forms import MainURLForm, LoginForm, RegistrationForm
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, session
 from utils import generateUniqueID, retry
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from datetime import timedelta 
 from functools import wraps
+import json 
 
 shortUrl_length = app.config['SHORTURL_LENGTH']
 
@@ -29,14 +30,27 @@ def login_disallowed(_fn=None, *, redirect_to=None):
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+  form = MainURLForm()
+  return render_template('index.html', form=form)
+
+@app.route('/result', methods=["GET", "POST"])
+def result():
+  if request.args.get('short'):
+    urlID = request.args.get('short')
+    url = URL.query.filter_by(short=urlID).first_or_404(
+      description=f'There is no data with {urlID}')
+    return render_template('short_url.html', url=url, title='Shortened URL')
+
   shortID = None
+  urlObject = None
   def insertURL(url):
-    nonlocal shortID 
+    nonlocal shortID
+    nonlocal urlObject
     shortID = generateUniqueID(shortUrl_length)
-    url = URL(full=url, short=shortID)
-    db.session.add(url)
+    urlObject = URL(full=url, short=shortID)
+    db.session.add(urlObject)
     db.session.commit()
-  form = MainURLForm()  
+  form = MainURLForm(request.form)
   if form.validate_on_submit():
     try:
       insertURL(form.fullUrl.data)
@@ -44,20 +58,14 @@ def index():
       db.session.rollback()
       retry(lambda: insertURL(form.fullUrl.data), 2)
     flash(f'Url is successfully shortified {shortID}')
-    return redirect(url_for('make_short_url', shortID=shortID))
-  return render_template('index.html', form=form)
+    return redirect(url_for('result', short=[shortID]))
+  return redirect(url_for('index'))
 
 @app.route('/l/<shortID>')
 def redirect_to_full(shortID):
   url = URL.query.filter_by(short=shortID).first_or_404(
     description=f'There is no data with {shortID}')
   return redirect(url.full)
-
-@app.route('/result/<shortID>')
-def make_short_url(shortID):
-  url = URL.query.filter_by(short=shortID).first_or_404(
-    description=f'There is no data with {shortID}')
-  return render_template('short_url.html', url=url, title='Shortened URL')
 
 @app.route('/login', methods=('GET', 'POST'))
 @login_disallowed
