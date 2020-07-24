@@ -1,6 +1,7 @@
 from app import app, db
 from app.models import URL, User, Visit
 from app.forms import MainURLForm, LoginForm, RegistrationForm
+from app.geolocation import locate
 from flask import render_template, flash, redirect, url_for, request, session
 from utils import retry
 from flask_login import current_user, login_user, logout_user, login_required
@@ -29,6 +30,7 @@ def login_disallowed(_fn=None, *, redirect_to=None):
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+  print(request.remote_addr)
   form = MainURLForm()
   return render_template('index.html', form=form)
 
@@ -65,6 +67,7 @@ def redirect_to_full(shortID):
     visit = Visit(url_record=url)
     db.session.add(visit)
     db.session.commit()
+    locate(request, visit.id)
 
   url = URL.query.filter_by(short=shortID).first_or_404(
     description=f'There is no data with {shortID}')

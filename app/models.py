@@ -39,6 +39,16 @@ class Visit(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   url_record = db.Column(db.Integer, db.ForeignKey('URL.id'))
   timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+  ip = db.Column(db.String(45))
+  country_code = db.Column(db.String(2)) #ISO 3166-1 alpha-2 codes
+  region_name = db.Column(db.String(50))
+  city_name = db.Column(db.String(50))
+
+  def set_geo_info(self, *, ip, country_code, region_name, city_name):
+    self.ip = ip
+    self.country_code = country_code
+    self.region_name = region_name
+    self.city_name = city_name
   
   def __repr__(self):
     return f'<Visit {self.id}>'
