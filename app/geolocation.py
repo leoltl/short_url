@@ -14,12 +14,17 @@ def search_and_save_ip_geolocation(ip, visit_id):
     region_name=data.get('regionName', 'N/A'),
     city_name=data.get('city', 'N/A')
   )
+  print(db.session.new)
+  print(db.session.deleted)
+  print(db.session.dirty)
   db.session.add(visit)
+  print(db.session.new)
+  print(db.session.deleted)
+  print(db.session.dirty)
   db.session.commit()
   return
 
-def locate(req, visit_id):
-  ip = req.remote_addr
-  if not ip:
-    return
+def async_geolocate
+
+def locate(ip, visit_id):
   Thread(target=search_and_save_ip_geolocation, args=(ip, visit_id)).start()
