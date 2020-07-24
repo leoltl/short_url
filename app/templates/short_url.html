@@ -8,8 +8,8 @@
       <div class="form-group align-bottom">
         <input 
           id="shortUrl" 
-          size="{{ url_for('redirect_to_full', shortID = url.short, _external=True)|length - 5 }}"
-          value="{{ url_for('redirect_to_full', shortID = url.short, _external=True) }}">
+          size="{{ url_for('main.redirect_to_full', shortID = url.short, _external=True)|length - 5 }}"
+          value="{{ url_for('main.redirect_to_full', shortID = url.short, _external=True) }}">
       </div>
       <button id="copy" class="btn btn-sm btn-primary" value="Copy shortened url">Copy URL</button>
       <div class="balloon align-top" id="balloon" style="visibility: hidden;">

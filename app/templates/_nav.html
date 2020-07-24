@@ -1,5 +1,5 @@
 <nav class="navbar navbar-dark navbar-expand-md" style="background-color: #179498;";">
-  <a class="navbar-brand" href="{{url_for('index')}}" style="color: black">
+  <a class="navbar-brand" href="{{url_for('main.index')}}" style="color: black">
     <img src="{{ url_for('static', filename='url.svg' )}}" style="width: 35px; height: 35px;">
     {{ config["APP_NAME"]}}
   </a>
@@ -9,14 +9,14 @@
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
-          <a class="nav-link" href="{{url_for('index')}}">Home <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="{{url_for('main.index')}}">Home <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Manage
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item" href="{{ url_for('dashboard')}}">Dashboard</a>
+            <a class="dropdown-item" href="{{ url_for('main.dashboard')}}">Dashboard</a>
             <a class="dropdown-item" href="#">Profile</a>
           </div>
         </li>
@@ -24,14 +24,14 @@
       <ul class="navbar-nav">
         {% if current_user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+          <a class="nav-link" href="{{ url_for('main.logout') }}">Logout</a>
         </li>
         {% else %}
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('login') }}">Log in</a>
+          <a class="nav-link" href="{{ url_for('main.login') }}">Log in</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('register') }}">Sign Up</a>
+          <a class="nav-link" href="{{ url_for('main.register') }}">Sign Up</a>
         </li>
         {% endif %}
       </ul>

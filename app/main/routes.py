@@ -1,8 +1,9 @@
-from app import app, db
-from app.models import URL, User, Visit
-from app.forms import MainURLForm, LoginForm, RegistrationForm
+from app import db
+from app.main import bp
+from app.models import User, Visit, URL
+from .forms import MainURLForm, LoginForm, RegistrationForm
 from app.geolocation import locate
-from flask import render_template, flash, redirect, url_for, request, session
+from flask import render_template, flash, redirect, url_for, request, current_app,session
 from utils import retry
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
@@ -10,6 +11,8 @@ from datetime import timedelta
 from functools import wraps
 from sqlalchemy import exc
 import json 
+
+
 
 def login_disallowed(_fn=None, *, redirect_to=None):
   # prevent signed in user to access specified (ie decorated) route, specify
@@ -27,14 +30,14 @@ def login_disallowed(_fn=None, *, redirect_to=None):
   else :
     return _login_disallowed(_fn)
 
-@app.route('/', methods=['GET', 'POST'])
-@app.route('/index', methods=['GET', 'POST'])
+@bp.route('/', methods=['GET', 'POST'])
+@bp.route('/index', methods=['GET', 'POST'])
 def index():
   print(request.remote_addr)
   form = MainURLForm()
   return render_template('index.html', form=form)
 
-@app.route('/result', methods=["GET", "POST"])
+@bp.route('/result', methods=["GET", "POST"])
 def result():
   if request.args.get('short'):
     urlID = request.args.get('short')
@@ -58,17 +61,17 @@ def result():
     except exc.IntegrityError:
       db.session.rollback()
       retry(lambda: insertURL(form.fullUrl.data), 2)
-    return redirect(url_for('result', short=[shortID]))
-  return redirect(url_for('index'))
+    return redirect(url_for('main.result', short=[shortID]))
+  return redirect(url_for('main.index'))
 
-@app.route('/l/<shortID>')
+@bp.route('/l/<shortID>')
 def redirect_to_full(shortID):
   def record_visit(url):
     visit = Visit(url_record=url)
     db.session.add(visit)
     db.session.commit()
     ip = request.remote_addr
-    if not ip or (not app.debug and ip == '127.0.0.1'):
+    if not ip or (not current_app.debug and ip == '127.0.0.1'):
       return
     locate(request.remote_addr, visit.id)
 
@@ -81,13 +84,13 @@ def redirect_to_full(shortID):
   record_visit(url.id)
   return redirect(url.full)
 
-@app.route('/dashboard')
+@bp.route('/dashboard')
 @login_required
 def dashboard():
   urls = current_user.urls.all()
   return render_template("dashboard.html", urls=urls)
 
-@app.route('/login', methods=('GET', 'POST'))
+@bp.route('/login', methods=('GET', 'POST'))
 @login_disallowed
 def login():
   form = LoginForm()
@@ -95,20 +98,20 @@ def login():
     user = User.query.filter_by(username=form.username.data).first()
     if not user or not user.check_password(form.password.data):
       flash('Invalid username or password')
-      return redirect(url_for("login"))
+      return redirect(url_for("main.login"))
     login_user(user, remember=form.remember_me.data)
     flash(f"Welcome, {user.name}")
     next_page = request.args.get('next')
-    return redirect(next_page if next_page and url_parse(next_page).netloc == '' else url_for('index'))
+    return redirect(next_page if next_page and url_parse(next_page).netloc == '' else url_for('main.index'))
   return render_template('login.html', form=form, title="Sign in")
 
-@app.route('/logout')
+@bp.route('/logout')
 def logout():
   logout_user()
   flash("You have successfully logged out.")
-  return redirect(url_for('index'))
+  return redirect(url_for('main.index'))
 
-@app.route('/register', methods=('GET', 'POST'))
+@bp.route('/register', methods=('GET', 'POST'))
 @login_disallowed
 def register():
   form = RegistrationForm()
@@ -121,10 +124,10 @@ def register():
     db.session.add(user)
     db.session.commit()
     login_user(user, remember=True)
-    return redirect(url_for('index'))
+    return redirect(url_for('main.index'))
   return render_template('register.html', form=form, title="Sign up")
 
-@app.route('/reset_password')
+@bp.route('/reset_password')
 def reset_password_request():
   pass
 

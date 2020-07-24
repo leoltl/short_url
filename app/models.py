@@ -1,12 +1,11 @@
-from app import db, app, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from utils import generateUniqueID
 from datetime import datetime
 from flask_login import UserMixin
-from utils import generateUniqueID
+from flask import current_app
+from app import db, login
 
-shortUrl_length = app.config['SHORTURL_LENGTH']
-
+shortUrl_length = current_app.config['SHORTURL_LENGTH']
 class URL(db.Model):
   id          = db.Column(db.Integer, primary_key=True)
   user_id     = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -21,7 +20,7 @@ class URL(db.Model):
   is_disabled = db.Column(
                   db.Boolean,
                   default=False)
-  visits    = db.relationship('Visit', backref="url_data", lazy="select")
+  visits      = db.relationship('Visit', backref="url_data", lazy="select")
 
   def set_value(self, *, full, userid):
     self.full    = verify_and_set_url(full)

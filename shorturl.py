@@ -1,6 +1,9 @@
 from dotenv import load_dotenv
+from app import create_app, db
+
 load_dotenv()
-from app import app, db
+app = create_app()
+
 from app.models import URL, User, Visit
 
 with app.app_context():

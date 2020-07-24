@@ -14,7 +14,7 @@
     <tbody>
       {% for url in urls %}
         <tr>
-          <td><a href="{{url_for('redirect_to_full', shortID=url.short)}}">{{ url.short }}</a></td>
+          <td><a href="{{url_for('main.redirect_to_full', shortID=url.short)}}">{{ url.short }}</a></td>
           <td><a href="{{ url.full }}">{{ url.full }}</a></td>
           <td>{{ url.visits|length }}</td>
           <td>{{ moment(url.create_at).format('LLL') }}</td>
