@@ -18,7 +18,7 @@ class URL(db.Model):
   create_at = db.Column(
                 db.DateTime,
                 default=datetime.utcnow)
-  visits    = db.relationship('Visit', backref="visits", lazy="select")
+  visits    = db.relationship('Visit', backref="url_data", lazy="select")
 
   def set_value(self, *, full, userid):
     self.verify_and_set_url(full)
