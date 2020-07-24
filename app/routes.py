@@ -67,7 +67,10 @@ def redirect_to_full(shortID):
     visit = Visit(url_record=url)
     db.session.add(visit)
     db.session.commit()
-    locate(request, visit.id)
+    ip = request.remote_addr
+    if not ip or (not app.debug and ip == '127.0.0.1'):
+      return
+    locate(request.remote_addr, visit.id)
 
   url = URL.query.filter_by(short=shortID).first_or_404(
     description=f'There is no data with {shortID}')
