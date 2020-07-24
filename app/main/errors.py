@@ -4,7 +4,7 @@ from app.main import bp
 
 @bp.errorhandler(404)
 def not_found_error(error=None):
-  return render_template("404.html", error=error), 400
+  return render_template('404.html', error=error), 400
 
 @bp.errorhandler(500)
 def internal_error(error):

@@ -12,7 +12,7 @@ with app.app_context():
     guest = User().set_value(name='guest', username='guest@shortify.com', email='guest@shortify.com', password='password')
     db.session.add(guest)
     db.session.commit()
-    print("Guest user is created")
+    print('Guest user is created')
 
 @app.shell_context_processor
 def make_shell_context():

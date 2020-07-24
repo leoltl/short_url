@@ -37,7 +37,7 @@ def index():
   form = MainURLForm()
   return render_template('index.html', form=form)
 
-@bp.route('/result', methods=["GET", "POST"])
+@bp.route('/result', methods=['GET', 'POST'])
 def result():
   if request.args.get('short'):
     urlID = request.args.get('short')
@@ -88,7 +88,7 @@ def redirect_to_full(shortID):
 @login_required
 def dashboard():
   urls = current_user.urls.all()
-  return render_template("dashboard.html", urls=urls)
+  return render_template('dashboard.html', urls=urls, title='Dashboard')
 
 @bp.route('/login', methods=('GET', 'POST'))
 @login_disallowed
@@ -98,17 +98,17 @@ def login():
     user = User.query.filter_by(username=form.username.data).first()
     if not user or not user.check_password(form.password.data):
       flash('Invalid username or password')
-      return redirect(url_for("main.login"))
+      return redirect(url_for('main.login'))
     login_user(user, remember=form.remember_me.data)
-    flash(f"Welcome, {user.name}")
+    flash(f'Welcome, {user.name}')
     next_page = request.args.get('next')
     return redirect(next_page if next_page and url_parse(next_page).netloc == '' else url_for('main.index'))
-  return render_template('login.html', form=form, title="Sign in")
+  return render_template('login.html', form=form, title='Sign in')
 
 @bp.route('/logout')
 def logout():
   logout_user()
-  flash("You have successfully logged out.")
+  flash('You have successfully logged out.')
   return redirect(url_for('main.index'))
 
 @bp.route('/register', methods=('GET', 'POST'))
@@ -125,7 +125,7 @@ def register():
     db.session.commit()
     login_user(user, remember=True)
     return redirect(url_for('main.index'))
-  return render_template('register.html', form=form, title="Sign up")
+  return render_template('register.html', form=form, title='Sign up')
 
 @bp.route('/reset_password')
 def reset_password_request():

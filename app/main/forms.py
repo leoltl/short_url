@@ -5,16 +5,16 @@ from app.models import User
 
 class MainURLForm(FlaskForm):
   fullUrl = StringField(
-    "Full Url", 
+    'Full Url', 
     validators=[DataRequired()], 
-    render_kw={"placeholder": 'Shorten your link'})
-  submit = SubmitField("Shorten URL")
+    render_kw={'placeholder': 'Shorten your link'})
+  submit = SubmitField('Shorten URL')
 
 class LoginForm(FlaskForm):
-  username = StringField("Username", validators=[DataRequired()])
-  password = PasswordField("Password", validators=[DataRequired()])
-  remember_me = BooleanField("Remember Me")
-  submit = SubmitField("Sign In")
+  username = StringField('Username', validators=[DataRequired()])
+  password = PasswordField('Password', validators=[DataRequired()])
+  remember_me = BooleanField('Remember Me')
+  submit = SubmitField('Sign In')
 
 class RegistrationForm(FlaskForm):
   name = StringField('Name', validators=[DataRequired()])
@@ -26,7 +26,7 @@ class RegistrationForm(FlaskForm):
   def validate_username(self, username):
     user = User.query.filter_by(username=username.data).first()
     if user is not None:
-      raise ValidationError("Please use a different username.")
+      raise ValidationError('Please use a different username.')
   
   def validate_email(self, email):
       user = User.query.filter_by(email=email.data).first()
