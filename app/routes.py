@@ -71,6 +71,10 @@ def redirect_to_full(shortID):
 
   url = URL.query.filter_by(short=shortID).first_or_404(
     description=f'There is no data with {shortID}')
+  if url.is_disabled:
+    flash('Sorry, URL you requested is disabled by the owner')
+    # TODO send to proper page to handle disabled url
+    return redirect('404')
   record_visit(url.id)
   return redirect(url.full)
 
