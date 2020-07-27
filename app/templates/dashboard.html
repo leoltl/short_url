@@ -1,30 +1,60 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container m-5 text-center">
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th scope="col">Short URL</th>
-        <th scope="col">Full URL</th>
-        <th scope="col">Number of visits</th>
-        <th scope="col">Created At</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for url in urls %}
-        <tr>
-          <td><a href="{{url_for('main.redirect_to_full', shortID=url.short)}}">{{ url.short }}</a></td>
-          <td><a href="{{ url.full }}">{{ url.full }}</a></td>
-          <td>{{ url.visits|length }}</td>
-          <td>{{ moment(url.create_at).format('LLL') }}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<div class="container mt-3 m-lg-5">
+  <div class="row" id="copy-listener">
+  {% for url in urls %}
+    <div class="mb-3 col-sm">
+      <div class="card text-left">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">Full link: <a href="{{url.full}}">{{ url.full }}</a></li>
+          <li class="list-group-item">Clicks: {{ url.visits|length }}</li>
+          <li class="list-group-item">Created At: {{ moment(url.create_at).format("lll") }}</li>
+        </ul>
+        <div class="card-footer">
+          <a href="{{ url_for('main.result', short=url.short) }}" class="card-link">Details</a>
+          <a href="{{ url_for('main.redirect_to_full', shortID=url.short) }}" class="card-link card-copy" id="{{url.short}}">
+            Copy short link
+          </a>
+          <span class="balloon ml-1" id="balloon" style="visibility: hidden;">
+            <span class="badge badge-light">URL Copied</span>
+          </span>          
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}
 
 {% block script %}
   {{ moment.include_moment() }}
+
+  <script>
+  (() => {
+
+    const shortBaseURL = `{{ url_for('main.redirect_to_full', _external=True)|safe }}`
+
+    document.getElementById('copy-listener').addEventListener('click', e => {
+      if (!e.target.className.includes('card-copy')) return
+      e.preventDefault()
+      const fullUrl = `${shortBaseURL}${e.target.id}`
+      updateClipboard(fullUrl)
+      flashVisibility(`#${e.target.id}+#balloon`)
+    })
+
+    function updateClipboard(newClip) {
+      navigator.clipboard.writeText(newClip)
+    }
+
+    function flashVisibility(elementSelector, durationInMs=2500) {
+      /* set tag visible and hidden after 2.5s*/
+      const elem = document.querySelector(elementSelector)
+      elem.style.visibility = "visible"
+      setTimeout(() => {
+        elem.style.visibility = "hidden"
+      }, durationInMs)
+    }
+  })()
+  </script>
 {% endblock %}

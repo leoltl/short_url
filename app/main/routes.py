@@ -48,6 +48,7 @@ def result():
     return redirect(url_for('main.result', short=[shortID]))
   return redirect(url_for('main.index'))
 
+@bp.route('/l/', defaults={'shortID':''})
 @bp.route('/l/<shortID>')
 def redirect_to_full(shortID):
   def record_visit(url_id):
