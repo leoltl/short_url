@@ -58,7 +58,7 @@ def redirect_to_full(shortID):
     print(ip, request.environ.get('HTTP_X_FORWARDED_FOR'))
     if not ip or (not current_app.debug and ip == '127.0.0.1'):
       return
-    locate(request.remote_addr, visit.id)
+    locate(ip, visit.id)
 
   url = URL.query.filter_by(short=shortID).first_or_404(
     description=f'There is no data with {shortID}')
