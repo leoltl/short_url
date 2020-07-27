@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-3 m-lg-5">
+<div class="container mt-3 m-lg-8">
   <div class="row" id="copy-listener">
   {% for url in urls %}
-    <div class="mb-3 col-sm">
+    <div class="mb-3 col-sm col-md-6 col-lg-4">
       <div class="card text-left">
         <ul class="list-group list-group-flush">
           <li class="list-group-item">Full link: <a href="{{url.full}}">{{ url.full }}</a></li>
@@ -40,7 +40,7 @@
       e.preventDefault()
       const fullUrl = `${shortBaseURL}${e.target.id}`
       updateClipboard(fullUrl)
-      flashVisibility(`#${e.target.id}+#balloon`)
+      flashVisibility(`[id='${e.target.id}']~#balloon`)
     })
 
     function updateClipboard(newClip) {
