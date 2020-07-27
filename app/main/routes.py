@@ -7,6 +7,8 @@ from flask import render_template, flash, redirect, url_for, request, current_ap
 from utils import retry
 from flask_login import current_user, login_required
 from sqlalchemy import exc
+import json
+import datetime
 
 @bp.route('/', methods=['GET', 'POST'])
 @bp.route('/index', methods=['GET', 'POST'])
@@ -14,13 +16,18 @@ def index():
   form = MainURLForm()
   return render_template('index.html', form=form)
 
+def datetimeconverter(o):
+    if isinstance(o, datetime.datetime):
+        return o.__str__()
+
 @bp.route('/result', methods=['GET', 'POST'])
 def result():
-  if request.args.get('short'):
+  if request.method == 'GET' and request.args.get('short'):
     urlID = request.args.get('short')
     url = URL.query.filter_by(short=urlID).first_or_404(
       description=f'There is no data with {urlID}')
-    return render_template('short_url.html', url=url, title='Shortened URL')
+    visits = json.dumps([visit.serialize() for visit in url.visits], default=datetimeconverter)
+    return render_template('short_url.html', url=url, visits=visits, title='Shortened URL')
 
   shortID, urlObject = None, None
   def insertURL(url):
@@ -43,8 +50,8 @@ def result():
 
 @bp.route('/l/<shortID>')
 def redirect_to_full(shortID):
-  def record_visit(url):
-    visit = Visit(url_record=url)
+  def record_visit(url_id):
+    visit = Visit(url_record=url_id)
     db.session.add(visit)
     db.session.commit()
     ip = request.remote_addr

@@ -1,0 +1,112 @@
+<!-- import openLayer javascript and css -->
+<script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/build/ol.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/css/ol.css">
+
+<!-- setup map object and add visits to map -->
+<script type="text/javascript">
+(function() {
+
+  function addVisit(lon, lat, cityName, regionName) {
+    const visit = new ol.Feature({
+      geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat])),
+      name: `${cityName}, ${regionName}`,
+    })
+    visits.addFeature(visit)
+  }
+
+  const visits = new ol.source.Vector({})
+
+  // render list of visits return from database in flask
+  urlVisits = {{ visits|safe }}
+  // map each visits to a point on map
+  urlVisits.filter(v => v.lon && v.lat).forEach(v => addVisit(v.lon, v.lat, v.city_name, v.region_name))
+
+  const visitCircleStyle = new ol.style.Circle({
+       radius: 8,
+       fill: new ol.style.Fill({
+         color: [0, 153, 255, 0.4]
+       }),
+       stroke: new ol.style.Stroke({
+         color: [0, 153, 255, 1]
+       })
+    })
+
+  const visitTagStyle = new ol.style.Style({
+    image: visitCircleStyle
+  })
+
+  const map = new ol.Map({
+    target: 'map',
+    layers: [
+      new ol.layer.Tile({
+        source: new ol.source.OSM(),
+      }),
+      new ol.layer.Vector({
+        source: visits,
+        style: visitTagStyle
+      })
+    ],
+    view: new ol.View({
+      center: ol.proj.fromLonLat([0, 40]),
+      zoom: 0,
+      minZoom: 0,
+      maxZoom: 10
+    })
+  });
+
+  const popupElem = document.getElementById('popup');
+
+  const popup = new ol.Overlay({
+    element: popupElem,
+    positioning: 'bottom-center',
+    stopEvent: false,
+    offset: [0, -10]
+  });
+
+  map.addOverlay(popup);
+
+  let popoverOpened = false;
+  // display popup on click
+  map.on('click', function(evt) {
+    let feature = map.forEachFeatureAtPixel(evt.pixel,
+      function(feature) {
+        return feature;
+      });
+    if (feature) {
+      let coordinates = feature.getGeometry().getCoordinates();
+      popup.setPosition(coordinates);
+      if (popoverOpened) {
+        // togger popup to get the updated location
+        $(popupElem).popover('dispose');
+      }  
+      $(popupElem).popover({
+        placement: 'top',
+        html: true,
+        content: feature.get('name')
+      });
+      $(popupElem).popover('show');
+      popoverOpened = true
+    } else {
+      $(popupElem).popover('dispose');
+      popoverOpened = false
+    }
+  });
+
+  map.on('moveend', function (evt) {
+    let zoomLevel = map.getView().getZoom()
+    visitCircleStyle.setRadius(8 * Math.pow((1.35), zoomLevel))
+  })
+
+  // change mouse cursor when over marker
+  map.on('pointermove', function(e) {
+    if (e.dragging) {
+      $(popupElem).popover('dispose');
+      return;
+    }
+    let pixel = map.getEventPixel(e.originalEvent);
+    let hit = map.hasFeatureAtPixel(pixel);
+    this.getTargetElement().style.cursor = hit ? 'pointer' : '';
+  });
+  
+})()
+</script> 

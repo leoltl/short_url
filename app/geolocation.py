@@ -14,7 +14,9 @@ def search_and_save_ip_geolocation(app, ip, visit_id):
       ip=ip,
       country_code=data.get('countryCode', 'N/A'),
       region_name=data.get('regionName', 'N/A'),
-      city_name=data.get('city', 'N/A')
+      city_name=data.get('city', 'N/A'),
+      lon=data.get('lon', None),
+      lat=data.get('lat', None)
     )
     db.session.add(visit)
     db.session.commit()

@@ -20,32 +20,43 @@
       Long URL: <a href="{{ url.full }}">{{ url.full }}</a>
     </div>
   </div>
+  <div class="container">
+    <div id="map" class="map">
+      <div id="popup"></div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block script %}
   <script>
     (() => {
       const copyBtn = document.getElementById("copy")
-      copyBtn.addEventListener('click', e => {
+      copyBtn.addEventListener("click", e => {
         e.preventDefault()
-        copyText()
+        copyText("#shortUrl")
+        flashVisibility("#balloon")
       })
 
-      function copyText() {
-        const copyText = document.getElementById("shortUrl")
+      function copyText(elementSelector) {
+        const copyText = document.querySelector(elementSelector)
         /* Select the text field */
         copyText.select();
         copyText.setSelectionRange(0, 99999); /*For mobile devices*/
         /* Copy the text inside the text field */
         document.execCommand("copy");
+      }
 
+      function flashVisibility(elementSelector, durationInMs=2500) {
         /* set tag visible and hidden after 2.5s*/
-        const balloon = document.getElementById("balloon")
-        balloon.style.visibility = "visible"
+        const elem = document.querySelector(elementSelector)
+        elem.style.visibility = "visible"
         setTimeout(() => {
-          balloon.style.visibility = "hidden"
-        }, 2500)
+          elem.style.visibility = "hidden"
+        }, durationInMs)
       }
     })()
-  </script>
+    </script>
+
+    {% include "_map.html" %}
+
 {% endblock%}
