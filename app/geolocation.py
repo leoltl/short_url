@@ -9,6 +9,7 @@ def search_and_save_ip_geolocation(app, ip, visit_id):
     # TODO: handle network request failure, save ip to a queue to 
     # geolate the visit at later time.
     data = requests.get(f'http://ip-api.com/json/{ip}').json()
+    print(data)
     visit = Visit.query.get(visit_id)
     visit.set_geo_info(
       ip=ip,
