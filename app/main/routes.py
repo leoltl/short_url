@@ -54,7 +54,8 @@ def redirect_to_full(shortID):
     visit = Visit(url_record=url_id)
     db.session.add(visit)
     db.session.commit()
-    ip = request.remote_addr
+    ip = request.remote_addr if request.environ.get('HTTP_X_FORWARDED_FOR') is None else request.environ['HTTP_X_FORWARDED_FOR']
+    print(ip, request.environ.get('HTTP_X_FORWARDED_FOR'))
     if not ip or (not current_app.debug and ip == '127.0.0.1'):
       return
     locate(request.remote_addr, visit.id)
