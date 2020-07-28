@@ -2,6 +2,9 @@
 
 {% block content %}
 <div class="container mt-3 m-lg-8">
+  {% if not urls|length :%}
+    <p>Create new link <a href="/">now</a>.</p>
+  {% endif %}
   <div class="row" id="copy-listener">
   {% for url in urls %}
     <div class="mb-3 col-sm col-md-6 col-lg-4">
