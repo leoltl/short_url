@@ -20,3 +20,8 @@ USER shorturl
 
 EXPOSE 5000
 ENTRYPOINT ["./boot.sh"]
+
+
+# command on docker build/ run
+# docker build -t <image-name> . 
+# docker run -d --name <container-name> -p <incoming-port>:5000 --mount type=bind,source=/home/pi/certs,target=/certs <image-name>

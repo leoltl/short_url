@@ -4,11 +4,11 @@
   <div class="container border mt-5 p-4 text-center">
     <h3>Your shortened URL</h3>
     <small>Copy the shortened link and share it in messages, texts, posts, websites and other locations.</small>
-    <form class="m-4">
+    <form class="m-lg-4">
       <div class="form-group align-bottom">
         <input 
           id="shortUrl" 
-          size="{{ url_for('main.redirect_to_full', shortID = url.short, _external=True)|length - 5 }}"
+          size="{{ [url_for('main.redirect_to_full', shortID = url.short, _external=True)|length - 5, 30]|min }}"
           value="{{ url_for('main.redirect_to_full', shortID = url.short, _external=True) }}">
       </div>
       <button id="copy" class="btn btn-sm btn-primary" value="Copy shortened url">Copy URL</button>
