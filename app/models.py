@@ -60,7 +60,7 @@ class URL(db.Model):
     return (self, self.short)
 
   def _verify_url(self, full_url):
-    return full_url if 'http' in full_url else f'http://{full_url}'
+    return full_url if 'http' in full_url.lower() else f'http://{full_url}'
 
   def __repr__(self):
     return f'<URL {self.full} - {self.id}>'
