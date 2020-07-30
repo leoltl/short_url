@@ -94,6 +94,8 @@ class Visit(db.Model):
   city_name    = db.Column(db.String(50))
   lat          = db.Column(db.Float())
   lon          = db.Column(db.Float())
+  ua_browser   = db.Column(db.String(64))
+  ua_platform  = db.Column(db.String(64))
 
   def set_geo_info(self, *, ip, country_code, region_name, city_name, lon, lat):
     self.ip           = ip 
@@ -102,6 +104,11 @@ class Visit(db.Model):
     self.city_name    = city_name
     self.lon          = lon
     self.lat          = lat
+  
+  def set_user_agent(self, browser, platform):
+    print('setting', browser, platform)
+    self.ua_browser = browser
+    self.ua_platform = platform
   
   def __repr__(self):
     return f'<Visit {self.id}>'
@@ -115,10 +122,10 @@ class Visit(db.Model):
       'region_name' : self.region_name,
       'city_name'   : self.city_name,
       'lon'         : self.lon,
-      'lat'         : self.lat
+      'lat'         : self.lat,
+      'ua_browser'  : self.ua_browser,
+      'ua_platform' : self.ua_platform
     }
-
-
 
 @login.user_loader
 def load_user(id):

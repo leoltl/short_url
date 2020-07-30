@@ -1,0 +1,90 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+
+<script>
+(function () {
+  
+  class VisitData {
+    constructor(data) {
+      this.chartTitle = ''
+      this.dataPoints = []
+      this.colors = []
+      this.borderColors = []
+      this.labels = []
+      this.initialize(data)
+    }
+
+    initialize(rawData) {
+      Object.entries(rawData).forEach(([key, value]) => {
+        this.labels.push(key)
+        this.dataPoints.push(value)
+        this.colors.push(this.getRandomColor())
+        this.borderColors.push(this.getRandomColor(true))
+      })
+    }
+
+    getRandomColor(forBorder=false, borderOpacity=0.2) {
+      var opacity = forBorder ? borderOpacity : 1;
+      var r = Math.floor(Math.random() * 255);
+      var g = Math.floor(Math.random() * 255);
+      var b = Math.floor(Math.random() * 255);
+      return `rgba(${r},${g},${b},${opacity})`;
+    };
+  }
+
+  
+  function processVisitsData(visits) {
+    const browserData = {}
+    const platformData = {}
+
+    visits.forEach(visit => {
+      if (visit.ua_browser === null || visit.ua_platform === null) {
+        return
+      }
+      if (!browserData[visit.ua_browser]) {
+        browserData[visit.ua_browser] = 0
+      }
+      if (!platformData[visit.ua_platform]) {
+        platformData[visit.ua_platform] = 0
+      }
+      browserData[visit.ua_browser]++
+      platformData[visit.ua_platform]++
+    })
+
+    return [new VisitData(browserData), new VisitData(platformData)]
+  }
+
+  function makeDoughnutChart(Visitstatistics, target) {
+    if (!Visitstatistics instanceof VisitData) { 
+      throw Error('Input has to be a VisitData class')
+    }
+    return new Chart(target, {
+      type: 'doughnut',
+      data: {
+        labels: Visitstatistics.labels,
+        datasets: [{
+            data: Visitstatistics.dataPoints,
+            backgroundColor: Visitstatistics.colors,
+            borderColor: Visitstatistics.borderColors,
+            borderWidth: 1
+        }]
+      },
+      options: {
+        title: {
+          display: true,
+          text: Visitstatistics.chartTitle
+        },
+        layout: {
+          padding: 50
+        }
+      }
+    });
+  }
+    const browserChart = document.getElementById('browser').getContext('2d')
+    const platformChart = document.getElementById('platform').getContext('2d')
+    const [browserStat, platformStat] = processVisitsData(window.urlVisits)
+    browserStat.chartTitle = 'Top Browsers'
+    platformStat.chartTitle = 'Top Platform'
+    makeDoughnutChart(browserStat, browserChart)
+    makeDoughnutChart(platformStat, platformChart)
+  }())
+</script>

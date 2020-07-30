@@ -13,6 +13,7 @@ import datetime
 @bp.route('/', methods=['GET', 'POST'])
 @bp.route('/index', methods=['GET', 'POST'])
 def index():
+  print(request.user_agent.browser)
   form = MainURLForm()
   return render_template('index.html', form=form)
 
@@ -53,14 +54,13 @@ def result():
 def redirect_to_full(shortID):
   def record_visit(url_id):
     visit = Visit(url_record=url_id)
+    visit.set_user_agent(request.user_agent.browser, request.user_agent.platform)
     db.session.add(visit)
     db.session.commit()
     ip = request.remote_addr if request.environ.get('HTTP_X_FORWARDED_FOR') is None else request.environ['HTTP_X_FORWARDED_FOR']
-    print(ip, request.environ.get('HTTP_X_FORWARDED_FOR'))
     if not ip or (not current_app.debug and ip == '127.0.0.1'):
       return
     locate(request.remote_addr, visit.id)
-
   url = URL.query.filter_by(short=shortID).first_or_404(
     description=f'There is no data with {shortID}')
   if url.is_disabled:
