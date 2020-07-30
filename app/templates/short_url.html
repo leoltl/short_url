@@ -20,6 +20,14 @@
       Long URL: <a href="{{ url.full }}">{{ url.full }}</a>
     </div>
   </div>
+  <div class="row text-center justify-content-md-center">
+    <div class="col-5">
+      <canvas id="browser" class="chart"></canvas>
+    </div>
+    <div class="col-5">
+      <canvas id="platform" class="chart"></canvas>
+    </div>
+  </div>
   <div class="container">
     <div id="map" class="map">
       <div id="popup"></div>
@@ -57,6 +65,12 @@
     })()
     </script>
 
+    <script>
+      // list of visits return from database in flask which is
+      // consumed in _map and _chart
+      window.urlVisits = {{ visits|safe }}
+    </script>
     {% include "_map.html" %}
+    {% include "_chart.html" %}
 
 {% endblock%}

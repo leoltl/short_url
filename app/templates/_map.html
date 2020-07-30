@@ -15,11 +15,14 @@
   }
 
   const visits = new ol.source.Vector({})
-
-  // render list of visits return from database in flask
-  urlVisits = {{ visits|safe }}
+  
+  // urlVisits is added as global variable in short_url.html
   // map each visits to a point on map
-  urlVisits.filter(v => v.lon && v.lat).forEach(v => addVisit(v.lon, v.lat, v.city_name, v.region_name))
+  urlVisits.forEach(v => {
+    if (v.lon && v.lat) {
+      addVisit(v.lon, v.lat, v.city_name, v.region_name)
+    }
+  });
 
   const visitCircleStyle = new ol.style.Circle({
        radius: 8,
