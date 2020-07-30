@@ -79,16 +79,21 @@
       }
     });
   }
-    const browserChart = document.getElementById('browser').getContext('2d')
-    const platformChart = document.getElementById('platform').getContext('2d')
+    const browserChart = document.getElementById('browser')
+    const platformChart = document.getElementById('platform')
     const [browserStat, platformStat] = processVisitsData(window.urlVisits)
     browserStat.chartTitle = 'Top Browsers'
     platformStat.chartTitle = 'Top Platform'
-    if (browserStat.dataPoints.length) {
-      makeDoughnutChart(browserStat, browserChart)
+    makeDoughnutChart(browserStat, browserChart.getContext('2d'))
+    makeDoughnutChart(platformStat, platformChart.getContext('2d'))
+    console.log('length', browserStat.dataPoints.length, platformStat.dataPoints.length)
+    if (!browserStat.dataPoints.length) {
+      console.log('remove', browserChart)
+      browserChart.remove()
     }
-    if (platformStat.dataPoints.length) {
-      makeDoughnutChart(platformStat, platformChart)
+    if (!platformStat.dataPoints.length) {
+      console.log('remove', platformChart)
+      platformChart.remove()
     }
   }())
 </script>
