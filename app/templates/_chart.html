@@ -84,7 +84,11 @@
     const [browserStat, platformStat] = processVisitsData(window.urlVisits)
     browserStat.chartTitle = 'Top Browsers'
     platformStat.chartTitle = 'Top Platform'
-    makeDoughnutChart(browserStat, browserChart)
-    makeDoughnutChart(platformStat, platformChart)
+    if (browserStat.dataPoints.length) {
+      makeDoughnutChart(browserStat, browserChart)
+    }
+    if (platformStat.dataPoints.length) {
+      makeDoughnutChart(platformStat, platformChart)
+    }
   }())
 </script>
